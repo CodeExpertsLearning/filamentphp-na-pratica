@@ -6,12 +6,16 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
@@ -27,6 +31,7 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->required()
                     ->reactive()
                     ->afterStateUpdated(function ($state, $set) {
                         $state = Str::slug($state);
@@ -35,9 +40,13 @@ class ProductResource extends Resource
                     })
                     ->label('Nome Produto'),
                 TextInput::make('description')->label('Descrição Produto'),
-                TextInput::make('price')->label('Preço Produto'),
-                TextInput::make('amount')->label('Quantidade Produto'),
-                TextInput::make('slug')->disabled()
+                TextInput::make('price')->required()->label('Preço Produto'),
+                TextInput::make('amount')->required()->label('Quantidade Produto'),
+                TextInput::make('slug')->disabled(),
+                FileUpload::make('photo')
+                    ->image()
+                    ->directory('products'),
+                //Select::make('categories')->relationship('categories', 'name')->multiple()
             ]);
     }
 
@@ -45,26 +54,39 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('price')->money('BRL'),
+                ImageColumn::make('photo')->circular()->height(80),
+                TextColumn::make('id')->sortable(),
+                TextColumn::make('name')->sortable()->searchable(),
+                TextColumn::make('price')->searchable()
+                    ->sortable()
+                    ->money('BRL'),
                 TextColumn::make('amount'),
                 TextColumn::make('created_at')->date('d/m/Y H:i:s')
             ])
             ->filters([
-                //
+                Filter::make('amount')
+                    ->toggle()
+                    ->label('Qtd Maior Que 9')
+                    ->query(fn (Builder $query) => $query->where('amount', '>=', 9)),
+
+                Filter::make('amount_mq') //->default()
+                    ->toggle()
+                    ->label('Qtd Menor Que 9')
+                    ->query(fn (Builder $query) => $query->where('amount', '<', 9))
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->defaultSort('created_at', 'DESC');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CategoriesRelationManager::class
         ];
     }
 
