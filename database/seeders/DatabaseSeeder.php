@@ -18,5 +18,21 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
+        $user = \App\Models\User::factory()
+            ->hasOrders(1)
+            ->create();
+
+        $order = $user->orders->first();
+
+        foreach (\App\Models\Product::orderByRaw('RANDOM()')->take(10)->get() as $prod) {
+            $amount = rand(1, 5);
+
+            $order->items()->create([
+                'product_id' => $prod->id,
+                'amount' => $amount,
+                'order_value' => $prod->price * $amount
+            ]);
+        }
     }
 }

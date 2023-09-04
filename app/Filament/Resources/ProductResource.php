@@ -24,28 +24,125 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationGroup = 'Admin';
+
+    protected static ?string $navigationIcon = 'heroicon-o-desktop-computer';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
-        return $form
+        return $form->columns(1)
             ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $state = Str::slug($state);
 
-                        $set('slug', $state);
-                    })
-                    ->label('Nome Produto'),
-                TextInput::make('description')->label('Descrição Produto'),
-                TextInput::make('price')->required()->label('Preço Produto'),
-                TextInput::make('amount')->required()->label('Quantidade Produto'),
-                TextInput::make('slug')->disabled(),
-                FileUpload::make('photo')
-                    ->image()
-                    ->directory('products'),
+
+                Forms\Components\Section::make('Heading 1')
+                    ->description('Descrição área...')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, $set) {
+                                $state = Str::slug($state);
+
+                                $set('slug', $state);
+                            })
+                            ->label('Nome Produto'),
+                        TextInput::make('description')->label('Descrição Produto'),
+                        TextInput::make('price')->required()->label('Preço Produto'),
+                        TextInput::make('amount')->required()->label('Quantidade Produto'),
+                    ]),
+
+                Forms\Components\Section::make('Heading 2')
+                    ->description('Cabeçalho sessão 2...')
+                    ->schema([
+                        TextInput::make('slug')->disabled(),
+                        FileUpload::make('photo')
+                            ->image()
+                            ->directory('products'),
+                    ])
+
+
+                // Forms\Components\Wizard::make()->schema([
+                //     Forms\Components\Wizard\Step::make('Tab1')->schema([
+                //         TextInput::make('name')
+                //             ->required()
+                //             ->reactive()
+                //             ->afterStateUpdated(function ($state, $set) {
+                //                 $state = Str::slug($state);
+
+                //                 $set('slug', $state);
+                //             })
+                //             ->label('Nome Produto'),
+                //         TextInput::make('description')->label('Descrição Produto'),
+                //         TextInput::make('price')->required()->label('Preço Produto'),
+                //     ]),
+
+                //     Forms\Components\Wizard\Step::make('Tab2')->schema([
+                //         TextInput::make('amount')->required()->label('Quantidade Produto'),
+                //         TextInput::make('slug')->disabled(),
+                //         FileUpload::make('photo')
+                //             ->image()
+                //             ->directory('products'),
+                //     ])
+                // ])
+
+
+                // Forms\Components\Tabs::make('Tabs')->tabs([
+                //     Forms\Components\Tabs\Tab::make('Tab1')->schema([
+                //         TextInput::make('name')
+                //             ->required()
+                //             ->reactive()
+                //             ->afterStateUpdated(function ($state, $set) {
+                //                 $state = Str::slug($state);
+
+                //                 $set('slug', $state);
+                //             })
+                //             ->label('Nome Produto'),
+                //         TextInput::make('description')->label('Descrição Produto'),
+                //         TextInput::make('price')->required()->label('Preço Produto'),
+                //     ]),
+
+                //     Forms\Components\Tabs\Tab::make('Tab2')->schema([
+                //         TextInput::make('amount')->required()->label('Quantidade Produto'),
+                //         TextInput::make('slug')->disabled(),
+                //         FileUpload::make('photo')
+                //             ->image()
+                //             ->directory('products'),
+                //     ])
+                // ])
+
+
+
+
+
+
+
+
+
+                // Forms\Components\Card::make()->schema([
+                //     TextInput::make('name')
+                //         ->required()
+                //         ->reactive()
+                //         ->afterStateUpdated(function ($state, $set) {
+                //             $state = Str::slug($state);
+
+                //             $set('slug', $state);
+                //         })
+                //         ->label('Nome Produto'),
+                //     TextInput::make('description')->label('Descrição Produto'),
+                //     TextInput::make('price')->required()->label('Preço Produto'),
+                //     TextInput::make('amount')->required()->label('Quantidade Produto'),
+                // ]),
+                // Forms\Components\Fieldset::make('Dados 2')->schema([
+                //     TextInput::make('slug')->disabled(),
+                //     FileUpload::make('photo')
+                //         ->image()
+                //         ->directory('products'),
+                // ])
+
                 //Select::make('categories')->relationship('categories', 'name')->multiple()
             ]);
     }
@@ -96,6 +193,12 @@ class ProductResource extends Resource
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'produ' => Pages\Produ::route('/produ')
         ];
+    }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        return self::getModel()::count();
     }
 }
