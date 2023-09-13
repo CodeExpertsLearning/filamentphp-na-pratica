@@ -22,6 +22,8 @@ class OrderResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin';
 
+    protected static ?string $navigationLabel = 'Pedidos';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
